@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>G-2 Minor FProject</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="static\images\icons\favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static\vendor\bootstrap\css\bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static\fonts\font-awesome-4.7.0\css\font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static\fonts\Linearicons-Free-v1.0.0\icon-font.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static\vendor\animate\animate.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static\vendor\css-hamburgers\hamburgers.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static\vendor\select2\select2.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static\css\util.css">
+	<link rel="stylesheet" type="text/css" href="static\css\main.css">
+<!--===============================================================================================-->
+<!--jQuery to include Katex format in html-->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+	<!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+</head>
+<body>
+
+
+	<div class="container-contact100" style="background-image: url('static/images/bg-01.jpg');">
+		<div class="wrap-contact100">
+			<form class="contact100-form validate-form">
+				<span class="contact100-form-title">
+					Equation Abstractor
+				</span>
+
+				<div class="wrap-input100 rs1-wrap-input100 validate-input" data-validate="Name is required">
+					<span class="label-input100">Tell us your name *</span>
+					<input class="input100" type="text" name="name" id="u_name" placeholder="Enter your name">
+				</div>
+
+				<div class="wrap-input100 rs1-wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+					<span class="label-input100">Enter your email (gmail) *</span>
+					<input class="input100" type="text" name="email" id="u_email" placeholder="Enter your email">
+				</div>
+
+				<div class="wrap-input100">
+					<!-- <input class="input100" type="file" accept="image/*" id="file" onchange="loadFile(event)" style="display: none;"> -->
+					<input type="file" accept="image/*" id="file" onchange="loadFile(event)" style="display: none;">
+					<!-- <label class="label-input100" for="file" style="cursor: pointer;">Upload your image</label> -->
+					<label class="label-input100" for="file">Upload your image &#8592;</label>
+					<input class="input100" type="text" id="inputfile_Name" placeholder="Upload your image...">
+					<img id="output" style="display: none;">
+				</div>
+
+				<div class="wrap-input100 validate-input" data-validate = "Message is required" id="container">
+					<span class="label-input100">Output</span>
+					<textarea class="input100" id="text_area" name="message" placeholder="Click on submit button to see relevant output"></textarea>
+				</div>
+
+				<div class="container-contact100-form-btn">
+					<div class="wrap-contact100-form-btn" style="display: inline-flex;">
+						<div class="contact100-form-bgbtn"></div>
+						<button class="contact100-form-btn" type="button", id="btn_submit", onclick="POST_image()">
+							Submit
+						</button>
+						<a href="{{ url_for('.download_file') }}">
+						<button class="contact100-form-btn" style="display: none;" type="button", id="btn_open">
+							Open Image
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+
+
+	<div id="dropDownSelect1"></div>
+
+<!--===============================================================================================-->
+	<script src="static\vendor\jquery\jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+	<script src="static\vendor\bootstrap\js\popper.js"></script>
+	<script src="static\vendor\bootstrap\js\bootstrap.min.js"></script>
+<!--===============================================================================================-->
+	<script src="static\vendor\select2\select2.min.js"></script>
+<!--===============================================================================================-->
+	<script src="static\js\main.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-23581568-13');
+
+  function disableTextArea() {
+	  var text_area = document.getElementById("text_area")
+	  text_area.value += '';
+	  text_area.disabled = true;
+  }
+
+  function enableTextArea() {
+	  var txt_Area = document.getElementById("text_area");
+	  txt_Area.disabled = false;
+  }
+
+  var loadFile = function(event) {
+	var image = document.getElementById('output');
+    image.src = URL.createObjectURL(event.target.files[0]);
+	alert(event.target.files[0].name);
+	document.getElementById("inputfile_Name").value += "Uploaded Image: " + event.target.files[0].name;
+  }
+
+  var getBase64Image = function(img) {
+	  var canvas = document.createElement("canvas")
+	  canvas.width = img.width;
+	  canvas.height = img.height;
+	  var ctx = canvas.getContext("2d");
+	  ctx.drawImage(img, 0, 0);
+	  var dataURL = canvas.toDataURL("image/png");
+	  return dataURL.replace("data:image/png;base64,", "");
+  }
+
+  var loadImg = function() {
+	  var base64  = getBase64Image(document.getElementById("output"))
+	  return base64
+  }
+
+  function POST_image () {
+	  // disable text input in text area 
+	  disableTextArea()
+
+	  console.log("Method is working")
+
+	  var name = document.getElementById("u_name").value
+	  var email = document.getElementById("u_email").value
+
+	  base64_dataURL = loadImg()
+
+	  var data = {
+		  image_base64: base64_dataURL,
+		  Name_: name,
+		  Email_: email
+	  }
+
+	  fetch(`${window.origin}/predict`, {
+		  method: 'POST',
+		  credentials: 'include',
+		  body: JSON.stringify(data),
+		  cache: 'no-cache',
+		  headers: new Headers({
+			  "content-type": "application/json"
+		  })
+	  })
+	  .then(function (response) {
+		  if (response.status != 200 && response.status != 202) {
+			  console.log(`Response status was not 200: ${response.status}`)
+			  return;
+		  }
+		  else {
+			  if (response.status == 202) {
+				  alert('Upload appropriate image!')
+				  location.reload()
+				  return false;
+				}
+			  else {
+				  alert('response sent via mail!')
+			  }
+		  }
+		  
+		  response.json().then(function (data) {
+			  var text_area = document.getElementById("text_area")
+			  text_area.value += data["tex"]
+			  console.log(data)
+			  // enableTextArea()
+			  // displaying hidden button with id "btn_open"
+			  document.getElementById("btn_open").style.display = "block"
+			  document.getElementById("btn_submit").style.display = "none"
+		  })
+	  })
+  }
+
+</script>
+
+</body>
+</html>

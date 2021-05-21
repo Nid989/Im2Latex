@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <h1>Basic GUI G-2</h1>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+        <!-- The loading of KaTeX is deferred to speed up page rendering -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+        <!-- To automatically render math in text elements, include the auto-render extension: -->
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous"
+            onload="renderMathInElement(document.body);"></script>
+    </head>
+    
+    <body>
+        <div>
+            <p><input type="file", accept="image/*", id="file", onchange="loadFile(event)" style="display: none;">
+            </p>
+            <p><label for="file", style="cursor: pointer;">Upload Image</label></p>
+            <!-- <p><img id="output" style="display: none;"/></p>  -->
+            <p><img id="output" style="display: none;"/></p>
+            <p>
+                <button type="button", id="btn_submit" onclick="POST_image()">
+                    show Formula
+                </button>
+            </p>
+            <canvas id="myCanvas"></canvas>
+        </div>
+        <div>
+            <p>
+                result Formula:
+                <div id="result"></div>
+                <!-- <p>container to display katex code...</p> -->
+                <div id="container">
+                    $$ S = \frac { k A } { 4 \pi \gamma l _ { p } ^ { 2 } } \operatorname { l n } \left( \frac { 3 + \sqrt { 5 } } { 2 } \right) , $$
+                </div>
+            </p>
+        </div>
+    </body>
+
+    <script>
+        // load image and store it in a hidden <img tag> with id = "output"
+        var loadFile = function (event) {
+            var image = document.getElementById('output');
+            image.src = URL.createObjectURL(event.target.files[0]);
+        };
+        
+        // method to convert image into a base64 url passed as input to json "data" variable
+        var getBase64Image = function(img) {
+            var canvas = document.createElement("canvas")
+            canvas.width = img.width;
+            canvas.height = img.height;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            var dataURL = canvas.toDataURL("image/png");
+            return dataURL.replace('data:image/png;base64,', "");
+        }
+        var loadImg = function () {
+            var base64 = getBase64Image(document.getElementById("output"));
+            return base64
+        }
+        // method to send data to the server and recieve appropriate response...
+        function POST_image() {
+            console.log("Method is working")
+            
+            // base64 representation of uploaded image
+            base64_dataURL = loadImg()
+
+            var data = {
+                image_base64: base64_dataURL
+            }
+
+            // console.log(data)
+            fetch(`${window.origin}/predict`, {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify(data),
+                cache: 'no-cache',
+                headers: new Headers({
+                    "content-type": "application/json"
+                })
+            })
+            .then(function (response) {
+                if (response.status != 200) {
+                    console.log(`Response status was not 200: ${response.status}`)
+                    return;
+                }
+
+                response.json().then(function (data) {
+                    console.log(data)
+                })
+            })
+        }
+    </script>
+</html>
